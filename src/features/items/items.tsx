@@ -10,7 +10,7 @@ interface Props {
 
 const fetchVote = async () => {
   const res = await axios.get("/api/item");
-  return res.data.items;
+  return res.data.itemsWithVoteStatus;
 };
 
 export const Items: React.FC<Props> = ({ className }) => {
@@ -20,6 +20,8 @@ export const Items: React.FC<Props> = ({ className }) => {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
   });
+
+  console.log(data);
 
   if (isLoading) return <div>Loading...</div>;
 

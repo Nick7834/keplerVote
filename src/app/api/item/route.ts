@@ -14,10 +14,24 @@ export async function GET() {
         const items = await prisma.item.findMany({
            include: {
                 author: { select: { id: true, username: true } },
+                votes: true, 
+                _count: { select: { votes: true } }
            }
         });
 
-        return NextResponse.json({ items }, { status: 200 });
+        const userVotes = await prisma.vote.findMany({
+            where: { authorId: parseInt(user.id) },
+            select: { itemId: true } 
+        });
+
+        const votedItemIds = new Set(userVotes.map(vote => vote.itemId));
+
+        const itemsWithVoteStatus = items.map(item => ({
+            ...item,
+            hasVoted: votedItemIds.has(item.id),
+        }));
+
+        return NextResponse.json({ itemsWithVoteStatus }, { status: 200 });
 
     }  catch(error) {
         console.error(error);
